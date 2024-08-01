@@ -6,15 +6,11 @@ import java.util.ArrayList;
 
 public class Staff extends User {
     private ArrayList<String> requests;
-    private String position;
-    private String id;
 
     // Constructor ----------------------------------------------
-    public Staff(String userID, String name, String email, String role, String position, String id) {
+    public Staff(String userID, String name, String email, String role) {
         super(userID, name, email, role);
         this.requests = new ArrayList<>();
-        this.position = position;
-        this.id = id;
     }
 
     // Methods
