@@ -3,17 +3,17 @@
 // The staff object has methods to assign and remove requests from that list.
 
 import java.util.ArrayList;
-import user.java;
 
-public class Staff extends user {
+public class Staff extends User {
     private ArrayList<String> requests;
 
-    // Constructor ----------------------------------------------
-    public Staff() {
+    // Constructor
+    public Staff(String userId, String name, String email, String role) {
+        super(userId, name, email, role);
         this.requests = new ArrayList<>();
     }
 
-    // Methods --------------------------------------------------
+    // Methods
     public void assignRequestToStaff(String request) {
         requests.add(request);
     }
@@ -22,12 +22,12 @@ public class Staff extends user {
         requests.remove(request);
     }
 
-    // Getters --------------------------------------------------
+    // Getters
     public ArrayList<String> getAssignedRequests() {
         return requests;
     }
 
-    // Setters --------------------------------------------------
+    // Setters
     public void setRequests(ArrayList<String> requests) {
         this.requests = requests;
     }
