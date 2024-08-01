@@ -66,6 +66,17 @@ public class MaintenanceRequest {
         this.assignedStaff = assignedStaff;
     }
 
+    // Override toString method
+    @Override
+    public String toString() {
+        return "Request ID: " + requestId + "\n" +
+                "Tenant Name: " + tenantName + "\n" +
+                "Issue Description: " + issueDescription + "\n" +
+                "Urgency Level: " + urgencyLevel + "\n" +
+                "Status: " + status + "\n" +
+                "Assigned Staff: " + assignedStaff + "\n";
+    }
+
     // Other Methods
     public String getDetails() {
         return "Request ID: " + requestId + "\n" +
