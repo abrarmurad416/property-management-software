@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Staff {
     private ArrayList<String> requests;
     private String position;
-    private String id;
+    private int id;
 
     // Constructor ----------------------------------------------
     public Staff(String position, String id) {
