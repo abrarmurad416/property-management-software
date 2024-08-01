@@ -1,20 +1,16 @@
 // Author, Mason Barney
-// The staff object holds 3 attributes; a list of requests, a position, and an id. 
-// The staff object has getters and setters for all attributes.
-// The staff object has methods to assign and remove requests from the list of requests.
+// The staff object holds 1 attribute; a list of requests
+// The staff object has methods to assign and remove requests from that list.
 
 import java.util.ArrayList;
+import user.java;
 
-public class Staff {
+public class Staff extends user {
     private ArrayList<String> requests;
-    private String position;
-    private int id;
 
     // Constructor ----------------------------------------------
-    public Staff(String position, String id) {
+    public Staff() {
         this.requests = new ArrayList<>();
-        this.position = position
-        this.id = id;
     }
 
     // Methods --------------------------------------------------
@@ -31,24 +27,8 @@ public class Staff {
         return requests;
     }
 
-    public String getPosition() {
-        return position;
-    }
-
-    public String getId() {
-        return id;
-    }
-
     // Setters --------------------------------------------------
     public void setRequests(ArrayList<String> requests) {
         this.requests = requests;
-    }
-    
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 }
