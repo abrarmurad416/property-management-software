@@ -14,6 +14,7 @@ public class Staff extends User {
         super(userID, name, email, role);
         this.requests = new ArrayList<>();
         this.position = position;
+        this.id = id;
     }
 
     // Methods
