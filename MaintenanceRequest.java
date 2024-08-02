@@ -1,3 +1,4 @@
+//Author: Sohan Hossain
 public class MaintenanceRequest {
     private int requestId;
     private String tenantName;
