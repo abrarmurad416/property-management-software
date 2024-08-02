@@ -6,6 +6,7 @@ import java.util.List;
 
 public class RequestManager {
     private List<MaintenanceRequest> requests;
+    private List<User> users;
 
     // Constructor
     public RequestManager() {
