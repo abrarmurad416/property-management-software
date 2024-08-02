@@ -6,15 +6,18 @@ public class MaintenanceRequest {
     private int urgencyLevel; // 0: Low, 1: Medium, 2: High
     private String status;
     private String assignedStaff;
+    private String requestType;
 
     // Constructor
-    public MaintenanceRequest(int requestId, String tenantName, String issueDescription, int urgencyLevel) {
+    public MaintenanceRequest(int requestId, String tenantName, String issueDescription, int urgencyLevel, String requestType) {
         this.requestId = requestId;
         this.tenantName = tenantName;
         this.issueDescription = issueDescription;
         this.urgencyLevel = urgencyLevel;
         this.status = "Pending";
         this.assignedStaff = "";
+        this.requestType = requestType;
+
     }
 
     // Getters
@@ -65,6 +68,14 @@ public class MaintenanceRequest {
 
     public void setAssignedStaff(String assignedStaff) {
         this.assignedStaff = assignedStaff;
+    }
+
+    public String getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(String requestType) {
+        this.requestType = requestType;
     }
 
     // Override toString method

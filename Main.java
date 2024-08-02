@@ -1,4 +1,21 @@
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.chart.plot.PlotOrientation;
+
+
+
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,9 +28,9 @@ public class Main {
     private static List<Staff> staffList;
 
     public static void main(String[] args) {
-        Generator.generateRandomTenants(10);
-        staffList = Generator.generateRandomStaff(5);
-        requests = Generator.generateRandomMaintenanceRequests(7);
+        Generator.generateRandomTenants(50);
+        staffList = Generator.generateRandomStaff(15);
+        requests = Generator.generateRandomMaintenanceRequests(74);
 
         JFrame loginFrame = new JFrame("Login Page");
         loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -73,84 +90,249 @@ public class Main {
         mainFrame.setSize(800, 600);
         mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         mainFrame.setResizable(true);
-    
+
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainFrame.add(mainPanel);
-    
-        // Create a larger canvas in the center
-        JPanel canvas = new JPanel();
-        canvas.setPreferredSize(new Dimension(400, 200));  // Canvas size
-        canvas.setLayout(new FlowLayout());  // Layout for the canvas
-        mainPanel.add(canvas, BorderLayout.CENTER);
-    
-        // Create a smaller button inside the canvas for viewing requests
+
+        // Create navigation panel on the left
+        JPanel navPanel = new JPanel();
+        navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
+        navPanel.setPreferredSize(new Dimension(200, mainFrame.getHeight()));
+        mainPanel.add(navPanel, BorderLayout.WEST);
+
+        JLabel navTitle = new JLabel("Navigation Bar");
+        navTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        navPanel.add(navTitle);
+
+        JButton homeButton = new JButton("Home");
+        homeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        navPanel.add(homeButton);
+
+        JButton submitRequestButton = new JButton("Submit Request");
+        submitRequestButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        navPanel.add(submitRequestButton);
+
         JButton viewRequestsButton = new JButton("View Requests");
-        viewRequestsButton.setPreferredSize(new Dimension(150, 40));  // Smaller button size
-        canvas.add(viewRequestsButton);
-    
+        viewRequestsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        navPanel.add(viewRequestsButton);
+
+        JButton profileManagementButton = new JButton("Profile Management");
+        profileManagementButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        navPanel.add(profileManagementButton);
+
+        // Create a welcome panel in the center
+        JPanel welcomePanel = new JPanel();
+        welcomePanel.setLayout(new BoxLayout(welcomePanel, BoxLayout.Y_AXIS));
+        mainPanel.add(welcomePanel, BorderLayout.CENTER);
+
+        JLabel welcomeLabel = new JLabel("Welcome to the Property Management Dashboard!");
+        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        welcomePanel.add(welcomeLabel);
+
+        JLabel infoLabel = new JLabel("<html>This dashboard provides an overview of your property management tasks. Use the navigation bar on the left to access different features.<br><br>" +
+                "Here are some quick tips to help get you started:<br><br>" +
+                "<ul>" +
+                "<li>Submit Request: Report a new maintenance issue.</li>" +
+                "<li>View Request: Check the current status of your submitted requests.</li>" +
+                "<li>Profile Management: Update any of your personal information.</li>" +
+                "</ul><br>" +
+                "Thank you for choosing Group 21 to manage your properties!</html>");
+        infoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        welcomePanel.add(infoLabel);
+
         // Create a vertical sidebar on the right for staff listing
         JPanel staffPanel = new JPanel();
         staffPanel.setLayout(new BoxLayout(staffPanel, BoxLayout.Y_AXIS));
         staffPanel.setPreferredSize(new Dimension(200, mainFrame.getHeight()));
         staffPanel.setBorder(BorderFactory.createTitledBorder("Staff Members"));
         mainPanel.add(staffPanel, BorderLayout.EAST);
-    
+
         // Group staff by occupation
         Map<String, List<Staff>> staffByOccupation = staffList.stream()
                 .collect(Collectors.groupingBy(Staff::getOccupation));
-    
+
         // Add each occupation and its members to the staff panel
         for (Map.Entry<String, List<Staff>> entry : staffByOccupation.entrySet()) {
             JLabel occupationLabel = new JLabel("<html><u><b>" + entry.getKey() + "</b></u></html>");
             occupationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             staffPanel.add(occupationLabel);
-    
+
             for (Staff staff : entry.getValue()) {
                 JLabel staffNameLabel = new JLabel(staff.getName());
                 staffNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
                 staffPanel.add(staffNameLabel);
             }
         }
-    
-        // Add action listener to the button
+
+        // Add charts at the bottom of the main panel
+        JPanel chartPanel = new JPanel();
+        chartPanel.setLayout(new GridLayout(1, 2)); // One row, two columns
+        chartPanel.add(createBarChartPanel());
+        chartPanel.add(createPieChartPanel());
+        mainPanel.add(chartPanel, BorderLayout.SOUTH);
+
+        // Add action listener to the view requests button
         viewRequestsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showRequestsTable();
             }
         });
-    
+
         mainFrame.setVisible(true);
     }
-    
-    
 
+    private static JPanel createBarChartPanel() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-    private static void showRequestsTable() {
-        JFrame requestFrame = new JFrame("Maintenance Requests");
-        requestFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        requestFrame.setSize(600, 400);
+        // Group requests by urgency level
+        Map<Integer, Long> urgencyCount = requests.stream()
+                .collect(Collectors.groupingBy(MaintenanceRequest::getUrgencyLevel, Collectors.counting()));
 
-        JPanel requestPanel = new JPanel(new BorderLayout());
-        requestFrame.add(requestPanel);
-
-        String[] columnNames = {"ID", "Tenant Name", "Issue Description", "Urgency Level"};
-
-        String[][] data = new String[requests.size()][4];
-        for (int i = 0; i < requests.size(); i++) {
-            MaintenanceRequest request = requests.get(i);
-            data[i][0] = String.valueOf(request.getRequestId());
-            data[i][1] = request.getTenantName();
-            data[i][2] = request.getIssueDescription();
-            data[i][3] = String.valueOf(request.getUrgencyLevel());
+        // Add data to the dataset
+        for (Map.Entry<Integer, Long> entry : urgencyCount.entrySet()) {
+            String urgencyLabel = switch (entry.getKey()) {
+                case 0 -> "Low";
+                case 1 -> "Medium";
+                case 2 -> "High";
+                default -> "Unknown";
+            };
+            dataset.addValue(entry.getValue(), "Requests", urgencyLabel);
         }
 
-        JTable table = new JTable(data, columnNames);
-        JScrollPane scrollPane = new JScrollPane(table);
-        table.setFillsViewportHeight(true);
+        // Create the bar chart
+        JFreeChart barChart = ChartFactory.createBarChart(
+                "Request Priorities", // Chart title
+                "Priority", // X-axis label
+                "Count", // Y-axis label
+                dataset, // Data
+                PlotOrientation.VERTICAL,
+                false, true, false);
 
-        requestPanel.add(scrollPane, BorderLayout.CENTER);
+        // Customize the plot
+        CategoryPlot plot = (CategoryPlot) barChart.getPlot();
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
 
-        requestFrame.setVisible(true);
+        // Set colors for different priority levels
+        renderer.setSeriesPaint(0, Color.YELLOW); // Low priority
+        renderer.setSeriesPaint(1, Color.ORANGE); // Medium priority
+        renderer.setSeriesPaint(2, Color.RED); // High priority
+
+        return new ChartPanel(barChart);
     }
+
+    private static JPanel createPieChartPanel() {
+        DefaultPieDataset dataset = new DefaultPieDataset();
+
+        // Group requests by type
+        Map<String, Long> typeCount = requests.stream()
+                .collect(Collectors.groupingBy(MaintenanceRequest::getRequestType, Collectors.counting()));
+
+        // Add data to the dataset
+        for (Map.Entry<String, Long> entry : typeCount.entrySet()) {
+            dataset.setValue(entry.getKey(), entry.getValue());
+        }
+
+        // Create the pie chart
+        JFreeChart pieChart = ChartFactory.createPieChart(
+                "Request Types", // Chart title
+                dataset, // Data
+                true, true, false);
+
+        // Customize the plot
+        PiePlot plot = (PiePlot) pieChart.getPlot();
+        plot.setSectionPaint("Plumbing", Color.BLUE);
+        plot.setSectionPaint("Electricity", Color.RED);
+        plot.setSectionPaint("Pest Control", Color.GREEN);
+        // Add more colors for other request types as needed
+
+        return new ChartPanel(pieChart);
+    }
+
+
+
+private static void showRequestsTable() {
+    JFrame requestFrame = new JFrame("Maintenance Requests");
+    requestFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    requestFrame.setSize(800, 600);
+
+    JPanel requestPanel = new JPanel(new BorderLayout());
+    requestFrame.add(requestPanel);
+
+    String[] columnNames = {"ID", "Tenant Name", "Issue Description", "Urgency Level", "Request Type"};
+
+    String[][] data = new String[requests.size()][5];
+    for (int i = 0; i < requests.size(); i++) {
+        MaintenanceRequest request = requests.get(i);
+        data[i][0] = String.valueOf(request.getRequestId());
+        data[i][1] = request.getTenantName();
+        data[i][2] = request.getIssueDescription();
+        data[i][3] = String.valueOf(request.getUrgencyLevel());
+        data[i][4] = request.getRequestType();
+    }
+
+    JTable table = new JTable(data, columnNames);
+    TableRowSorter<TableModel> sorter = new TableRowSorter<>(table.getModel());
+    table.setRowSorter(sorter);
+    JScrollPane scrollPane = new JScrollPane(table);
+    table.setFillsViewportHeight(true);
+
+    // Add search field
+    JTextField searchField = new JTextField(15);
+    searchField.getDocument().addDocumentListener(new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            search(searchField.getText());
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            search(searchField.getText());
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            search(searchField.getText());
+        }
+
+        private void search(String str) {
+            if (str.length() == 0) {
+                sorter.setRowFilter(null);
+            } else {
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + str));
+            }
+        }
+    });
+
+    // Add filter by urgency level
+    String[] urgencyLevels = {"All", "Low", "Medium", "High"};
+    JComboBox<String> urgencyFilter = new JComboBox<>(urgencyLevels);
+    urgencyFilter.addActionListener(e -> {
+        String selected = (String) urgencyFilter.getSelectedItem();
+        if ("All".equals(selected)) {
+            sorter.setRowFilter(null);
+        } else {
+            int urgency = switch (selected) {
+                case "Low" -> 0;
+                case "Medium" -> 1;
+                case "High" -> 2;
+                default -> -1;
+            };
+            sorter.setRowFilter(RowFilter.numberFilter(RowFilter.ComparisonType.EQUAL, urgency, 3));
+        }
+    });
+
+    JPanel controlPanel = new JPanel();
+    controlPanel.add(new JLabel("Search:"));
+    controlPanel.add(searchField);
+    controlPanel.add(new JLabel("Filter by Urgency:"));
+    controlPanel.add(urgencyFilter);
+
+    requestPanel.add(controlPanel, BorderLayout.NORTH);
+    requestPanel.add(scrollPane, BorderLayout.CENTER);
+
+    requestFrame.setVisible(true);
+}
+
+    
 }

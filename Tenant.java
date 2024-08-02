@@ -27,9 +27,9 @@ public class Tenant extends User {
     }
 
     // Methods
-    public void submitRequest(String issueDescription, int urgencyLevel) {
-        int requestId = tenantRequests.size() + 1; // Simple way to generate requestId
-        MaintenanceRequest request = new MaintenanceRequest(requestId, getName(), issueDescription, urgencyLevel);
+    public void submitRequest(String issueDescription, int urgencyLevel, String orderType) {
+        int requestId = tenantRequests.size() + 1;
+        MaintenanceRequest request = new MaintenanceRequest(requestId, getName(), issueDescription, urgencyLevel, orderType);
         tenantRequests.add(request);
     }
 
