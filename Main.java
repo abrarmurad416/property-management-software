@@ -73,43 +73,45 @@ public class Main {
         mainFrame.setSize(800, 600);
         mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         mainFrame.setResizable(true);
-
+    
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainFrame.add(mainPanel);
-
-        // Create a larger button in the center for viewing requests
+    
+        // Create a larger canvas in the center
+        JPanel canvas = new JPanel();
+        canvas.setPreferredSize(new Dimension(400, 200));  // Canvas size
+        canvas.setLayout(new FlowLayout());  // Layout for the canvas
+        mainPanel.add(canvas, BorderLayout.CENTER);
+    
+        // Create a smaller button inside the canvas for viewing requests
         JButton viewRequestsButton = new JButton("View Requests");
-        viewRequestsButton.setPreferredSize(new Dimension(200, 50));
-        mainPanel.add(viewRequestsButton, BorderLayout.CENTER);
-
+        viewRequestsButton.setPreferredSize(new Dimension(150, 40));  // Smaller button size
+        canvas.add(viewRequestsButton);
+    
         // Create a vertical sidebar on the right for staff listing
         JPanel staffPanel = new JPanel();
         staffPanel.setLayout(new BoxLayout(staffPanel, BoxLayout.Y_AXIS));
         staffPanel.setPreferredSize(new Dimension(200, mainFrame.getHeight()));
+        staffPanel.setBorder(BorderFactory.createTitledBorder("Staff Members"));
         mainPanel.add(staffPanel, BorderLayout.EAST);
-
-        // Add a title label for the staff panel
-        JLabel staffLabel = new JLabel("Staff Members");
-        staffLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        staffPanel.add(staffLabel);
-
+    
         // Group staff by occupation
         Map<String, List<Staff>> staffByOccupation = staffList.stream()
                 .collect(Collectors.groupingBy(Staff::getOccupation));
-
+    
         // Add each occupation and its members to the staff panel
         for (Map.Entry<String, List<Staff>> entry : staffByOccupation.entrySet()) {
-            JLabel occupationLabel = new JLabel(entry.getKey());
+            JLabel occupationLabel = new JLabel("<html><u><b>" + entry.getKey() + "</b></u></html>");
             occupationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             staffPanel.add(occupationLabel);
-
+    
             for (Staff staff : entry.getValue()) {
                 JLabel staffNameLabel = new JLabel(staff.getName());
                 staffNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
                 staffPanel.add(staffNameLabel);
             }
         }
-
+    
         // Add action listener to the button
         viewRequestsButton.addActionListener(new ActionListener() {
             @Override
@@ -117,9 +119,12 @@ public class Main {
                 showRequestsTable();
             }
         });
-
+    
         mainFrame.setVisible(true);
     }
+    
+    
+
 
     private static void showRequestsTable() {
         JFrame requestFrame = new JFrame("Maintenance Requests");
