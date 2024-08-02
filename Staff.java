@@ -6,11 +6,13 @@ import java.util.ArrayList;
 
 public class Staff extends User {
     private ArrayList<String> requests;
+    private String occupation; 
 
     // Constructor ----------------------------------------------
-    public Staff(String userID, String name, String email, String role) {
+    public Staff(String userID, String name, String email, String role, String occupation) {
         super(userID, name, email, role);
         this.requests = new ArrayList<>();
+        this.occupation = occupation;
     }
 
     // Methods
@@ -30,5 +32,12 @@ public class Staff extends User {
     // Setters
     public void setRequests(ArrayList<String> requests) {
         this.requests = requests;
+    }
+    public String getOccupation() { 
+        return occupation;
+    }
+
+    public void setOccupation(String occupation) {
+        this.occupation = occupation;
     }
 }

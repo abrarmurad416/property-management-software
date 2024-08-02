@@ -49,11 +49,15 @@ public class Main {
 
         int option = JOptionPane.showConfirmDialog(null, message, "Create Maintenance Request", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            String description = descriptionField.getText();
-            int urgency = Integer.parseInt(urgencyField.getText());
-            MaintenanceRequest request = new MaintenanceRequest(requestManager.viewRequests().size() + 1, "Tenant Name", description, urgency);
-            requestManager.addRequest(request);
-            outputArea.setText("Maintenance request created.\n");
+            try {
+                String description = descriptionField.getText();
+                int urgency = Integer.parseInt(urgencyField.getText());
+                MaintenanceRequest request = new MaintenanceRequest(requestManager.viewRequests().size() + 1, "Tenant Name", description, urgency);
+                requestManager.addRequest(request);
+                outputArea.setText("Maintenance request created.\n");
+            } catch (NumberFormatException ex) {
+                outputArea.setText("Invalid input for urgency level. Please enter a number (0: Low, 1: Medium, 2: High).\n");
+            }
         }
     }
 
@@ -77,11 +81,15 @@ public class Main {
 
         int option = JOptionPane.showConfirmDialog(null, message, "Update Maintenance Request", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            int requestId = Integer.parseInt(requestIdField.getText());
-            String description = descriptionField.getText();
-            int urgency = Integer.parseInt(urgencyField.getText());
-            requestManager.updateRequest(requestId, description, urgency);
-            outputArea.setText("Maintenance request updated.\n");
+            try {
+                int requestId = Integer.parseInt(requestIdField.getText());
+                String description = descriptionField.getText();
+                int urgency = Integer.parseInt(urgencyField.getText());
+                requestManager.updateRequest(requestId, description, urgency);
+                outputArea.setText("Maintenance request updated.\n");
+            } catch (NumberFormatException ex) {
+                outputArea.setText("Invalid input. Please ensure all fields are correctly filled.\n");
+            }
         }
     }
 
@@ -93,9 +101,13 @@ public class Main {
 
         int option = JOptionPane.showConfirmDialog(null, message, "Delete Maintenance Request", JOptionPane.OK_CANCEL_OPTION);
         if (option == JOptionPane.OK_OPTION) {
-            int requestId = Integer.parseInt(requestIdField.getText());
-            requestManager.deleteRequest(requestId);
-            outputArea.setText("Maintenance request deleted.\n");
+            try {
+                int requestId = Integer.parseInt(requestIdField.getText());
+                requestManager.deleteRequest(requestId);
+                outputArea.setText("Maintenance request deleted.\n");
+            } catch (NumberFormatException ex) {
+                outputArea.setText("Invalid input. Please ensure the Request ID is a number.\n");
+            }
         }
     }
 }
