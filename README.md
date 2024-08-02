@@ -23,8 +23,8 @@
 <h3>Steps</h3>
 <ol>
     <li><b>Clone the repository:</b>
-        <pre><code>git clone https://github.com/yourusername/property-management-system.git
-cd property-management-system</code></pre>
+        <pre><code>git clone https://github.com/abrarmurad416/property-management-software.git
+cd property-management-software</code></pre>
     </li>
     <li><b>Open the project in your IDE:</b>
         <p>Open your IDE (e.g., IntelliJ IDEA, Eclipse, or VSCode).</p>
