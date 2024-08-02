@@ -30,9 +30,12 @@ public class Generator {
     };
     private static final String[] EMAIL_DOMAINS = {"outlook.com", "gmail.com", "email.com", "hotmail.com", "mylaurier.ca"};
     private static final String[] OCCUPATIONS = {"Electrician", "Plumber", "Janitor", "IT Support", "Security"};
+    private static final String[] ISSUES = {"Leaky faucet", "Broken heater", "Clogged drain", "Electrical outage", "Pest control"};
+
+    private static List<Tenant> tenants = new ArrayList<>();
 
     public static List<Tenant> generateRandomTenants(int count) {
-        List<Tenant> tenants = new ArrayList<>();
+        tenants.clear(); // Clear the list before generating new tenants
         Random random = new Random();
 
         for (int i = 0; i < count; i++) {
@@ -68,5 +71,20 @@ public class Generator {
         }
 
         return staff;
+    }
+
+    public static List<MaintenanceRequest> generateRandomMaintenanceRequests(int count) {
+        List<MaintenanceRequest> requests = new ArrayList<>();
+        Random random = new Random();
+
+        for (int i = 0; i < count; i++) {
+            Tenant tenant = tenants.get(random.nextInt(tenants.size()));
+            String description = ISSUES[random.nextInt(ISSUES.length)];
+            int urgency = random.nextInt(3); // 0: Low, 1: Medium, 2: High
+            MaintenanceRequest request = new MaintenanceRequest(i + 1, tenant.getName(), description, urgency);
+            requests.add(request);
+        }
+
+        return requests;
     }
 }

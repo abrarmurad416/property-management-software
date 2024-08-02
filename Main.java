@@ -1,113 +1,151 @@
-import java.awt.*;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Main {
-    private static final RequestManager requestManager = new RequestManager();
+    private static List<MaintenanceRequest> requests;
+    private static List<Staff> staffList;
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Maintenance Request Management System");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(600, 400);
+        Generator.generateRandomTenants(10);
+        staffList = Generator.generateRandomStaff(5);
+        requests = Generator.generateRandomMaintenanceRequests(7);
 
-            Container container = frame.getContentPane();
-            container.setLayout(new BorderLayout());
+        JFrame loginFrame = new JFrame("Login Page");
+        loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        loginFrame.setSize(400, 200);
 
-            JPanel panel = new JPanel(new GridLayout(0, 2, 10, 10));
-            container.add(panel, BorderLayout.CENTER);
+        JPanel panel = new JPanel();
+        loginFrame.add(panel);
+        placeComponents(panel, loginFrame);
 
-            JButton createButton = new JButton("Create Request");
-            JButton viewButton = new JButton("View Requests");
-            JButton updateButton = new JButton("Update Request");
-            JButton deleteButton = new JButton("Delete Request");
+        loginFrame.setVisible(true);
+    }
 
-            panel.add(createButton);
-            panel.add(viewButton);
-            panel.add(updateButton);
-            panel.add(deleteButton);
+    private static void placeComponents(JPanel panel, JFrame loginFrame) {
+        panel.setLayout(null);
 
-            JTextArea outputArea = new JTextArea();
-            outputArea.setEditable(false);
-            container.add(new JScrollPane(outputArea), BorderLayout.SOUTH);
+        JLabel userLabel = new JLabel("User:");
+        userLabel.setBounds(10, 20, 80, 25);
+        panel.add(userLabel);
 
-            createButton.addActionListener(e -> createRequest(outputArea));
-            viewButton.addActionListener(e -> viewRequests(outputArea));
-            updateButton.addActionListener(e -> updateRequest(outputArea));
-            deleteButton.addActionListener(e -> deleteRequest(outputArea));
+        JPasswordField userText = new JPasswordField(20);
+        userText.setBounds(100, 20, 165, 25);
+        userText.setText("username");
+        panel.add(userText);
 
-            frame.setVisible(true);
+        JLabel passwordLabel = new JLabel("Password:");
+        passwordLabel.setBounds(10, 50, 80, 25);
+        panel.add(passwordLabel);
+
+        JPasswordField passwordText = new JPasswordField(20);
+        passwordText.setBounds(100, 50, 165, 25);
+        passwordText.setText("password");
+        panel.add(passwordText);
+
+        JButton loginButton = new JButton("Login");
+        loginButton.setBounds(150, 100, 80, 25);
+        panel.add(loginButton);
+
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = new String(userText.getPassword());
+                String password = new String(passwordText.getPassword());
+
+                if (username.equals("username") && password.equals("password")) {
+                    loginFrame.dispose();
+                    showMainSoftware();
+                } else {
+                    JOptionPane.showMessageDialog(panel, "Invalid username or password.");
+                }
+            }
         });
     }
 
-    private static void createRequest(JTextArea outputArea) {
-        JTextField descriptionField = new JTextField();
-        JTextField urgencyField = new JTextField();
-        Object[] message = {
-                "Issue Description:", descriptionField,
-                "Urgency Level (0: Low, 1: Medium, 2: High):", urgencyField
-        };
+    private static void showMainSoftware() {
+        JFrame mainFrame = new JFrame("Main Software Interface");
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setSize(800, 600);
+        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        mainFrame.setResizable(true);
 
-        int option = JOptionPane.showConfirmDialog(null, message, "Create Maintenance Request", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            try {
-                String description = descriptionField.getText();
-                int urgency = Integer.parseInt(urgencyField.getText());
-                MaintenanceRequest request = new MaintenanceRequest(requestManager.viewRequests().size() + 1, "Tenant Name", description, urgency);
-                requestManager.addRequest(request);
-                outputArea.setText("Maintenance request created.\n");
-            } catch (NumberFormatException ex) {
-                outputArea.setText("Invalid input for urgency level. Please enter a number (0: Low, 1: Medium, 2: High).\n");
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainFrame.add(mainPanel);
+
+        // Create a larger button in the center for viewing requests
+        JButton viewRequestsButton = new JButton("View Requests");
+        viewRequestsButton.setPreferredSize(new Dimension(200, 50));
+        mainPanel.add(viewRequestsButton, BorderLayout.CENTER);
+
+        // Create a vertical sidebar on the right for staff listing
+        JPanel staffPanel = new JPanel();
+        staffPanel.setLayout(new BoxLayout(staffPanel, BoxLayout.Y_AXIS));
+        staffPanel.setPreferredSize(new Dimension(200, mainFrame.getHeight()));
+        mainPanel.add(staffPanel, BorderLayout.EAST);
+
+        // Add a title label for the staff panel
+        JLabel staffLabel = new JLabel("Staff Members");
+        staffLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        staffPanel.add(staffLabel);
+
+        // Group staff by occupation
+        Map<String, List<Staff>> staffByOccupation = staffList.stream()
+                .collect(Collectors.groupingBy(Staff::getOccupation));
+
+        // Add each occupation and its members to the staff panel
+        for (Map.Entry<String, List<Staff>> entry : staffByOccupation.entrySet()) {
+            JLabel occupationLabel = new JLabel(entry.getKey());
+            occupationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            staffPanel.add(occupationLabel);
+
+            for (Staff staff : entry.getValue()) {
+                JLabel staffNameLabel = new JLabel(staff.getName());
+                staffNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                staffPanel.add(staffNameLabel);
             }
         }
-    }
 
-    private static void viewRequests(JTextArea outputArea) {
-        StringBuilder sb = new StringBuilder();
-        for (MaintenanceRequest request : requestManager.viewRequests()) {
-            sb.append(request.getDetails()).append("\n");
-        }
-        outputArea.setText(sb.toString());
-    }
-
-    private static void updateRequest(JTextArea outputArea) {
-        JTextField requestIdField = new JTextField();
-        JTextField descriptionField = new JTextField();
-        JTextField urgencyField = new JTextField();
-        Object[] message = {
-                "Request ID:", requestIdField,
-                "New Issue Description:", descriptionField,
-                "New Urgency Level (0: Low, 1: Medium, 2: High):", urgencyField
-        };
-
-        int option = JOptionPane.showConfirmDialog(null, message, "Update Maintenance Request", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            try {
-                int requestId = Integer.parseInt(requestIdField.getText());
-                String description = descriptionField.getText();
-                int urgency = Integer.parseInt(urgencyField.getText());
-                requestManager.updateRequest(requestId, description, urgency);
-                outputArea.setText("Maintenance request updated.\n");
-            } catch (NumberFormatException ex) {
-                outputArea.setText("Invalid input. Please ensure all fields are correctly filled.\n");
+        // Add action listener to the button
+        viewRequestsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showRequestsTable();
             }
-        }
+        });
+
+        mainFrame.setVisible(true);
     }
 
-    private static void deleteRequest(JTextArea outputArea) {
-        JTextField requestIdField = new JTextField();
-        Object[] message = {
-                "Request ID:", requestIdField
-        };
+    private static void showRequestsTable() {
+        JFrame requestFrame = new JFrame("Maintenance Requests");
+        requestFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        requestFrame.setSize(600, 400);
 
-        int option = JOptionPane.showConfirmDialog(null, message, "Delete Maintenance Request", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            try {
-                int requestId = Integer.parseInt(requestIdField.getText());
-                requestManager.deleteRequest(requestId);
-                outputArea.setText("Maintenance request deleted.\n");
-            } catch (NumberFormatException ex) {
-                outputArea.setText("Invalid input. Please ensure the Request ID is a number.\n");
-            }
+        JPanel requestPanel = new JPanel(new BorderLayout());
+        requestFrame.add(requestPanel);
+
+        String[] columnNames = {"ID", "Tenant Name", "Issue Description", "Urgency Level"};
+
+        String[][] data = new String[requests.size()][4];
+        for (int i = 0; i < requests.size(); i++) {
+            MaintenanceRequest request = requests.get(i);
+            data[i][0] = String.valueOf(request.getRequestId());
+            data[i][1] = request.getTenantName();
+            data[i][2] = request.getIssueDescription();
+            data[i][3] = String.valueOf(request.getUrgencyLevel());
         }
+
+        JTable table = new JTable(data, columnNames);
+        JScrollPane scrollPane = new JScrollPane(table);
+        table.setFillsViewportHeight(true);
+
+        requestPanel.add(scrollPane, BorderLayout.CENTER);
+
+        requestFrame.setVisible(true);
     }
 }
