@@ -44,15 +44,9 @@ cd property-management-software</code></pre>
 
 <h2 id="features">Features</h2>
 <ul>
-    <li><b>User Management:</b>
-        <ul>
-            <li>Create, view, update, and delete user profiles.</li>
-        </ul>
-    </li>
-    <li><b>Staff Management:</b>
-        <ul>
-            <li>Assign and remove requests to/from staff members.</li>
-            <li>View all assigned requests.</li>
-        </ul>
-    </li>
+    <li>Home page, submit requests, view requests, profile management.</li>
+    <li>Staff members and roles.</li>
+    <li>requests with title, description, and urgency level.</li>
+    <li>Navigation bar.</li>
+    <li>Pending requests.</li>
 </ul>
