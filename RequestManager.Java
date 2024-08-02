@@ -1,4 +1,6 @@
-//Author: Sohan Hossain
+// Author: Sohan Hossain
+// Additions: Mason Barney
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,16 +21,6 @@ public class RequestManager {
     // View all maintenance requests
     public List<MaintenanceRequest> viewRequests() {
         return new ArrayList<>(requests);
-    }
-
-    // View a specific maintenance request
-    public MaintenanceRequest viewRequest(int requestId) {
-        for (MaintenanceRequest request : requests) {
-            if (request.getRequestId() == requestId) {
-                return request;
-            }
-        }
-        return null;
     }
 
     // View all maintenance requests assigned to a specific staff member
