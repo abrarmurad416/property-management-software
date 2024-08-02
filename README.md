@@ -7,8 +7,6 @@
     <li><a href="#installation">Installation</a></li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#features">Features</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
 </ul>
 
 <h2 id="installation">Installation</h2>
@@ -28,13 +26,6 @@ cd property-management-software</code></pre>
     </li>
     <li><b>Open the project in your IDE:</b>
         <p>Open your IDE (e.g., IntelliJ IDEA, Eclipse, or VSCode).</p>
-        <p>Import the project by selecting the <code>pom.xml</code> file if you are using Maven, or <code>build.gradle</code> if you are using Gradle.</p>
-    </li>
-    <li><b>Build the project:</b>
-        <p>If you are using Maven, run:</p>
-        <pre><code>mvn clean install</code></pre>
-        <p>If you are using Gradle, run:</p>
-        <pre><code>gradle build</code></pre>
     </li>
 </ol>
 
@@ -47,3 +38,21 @@ cd property-management-software</code></pre>
         <p>Run the <code>Main</code> class from your IDE.</p>
     </li>
 </ol>
+
+<h3>Interacting with the Application</h3>
+<p>The application has several functionalities, such as viewing and updating user profiles, assigning and removing requests for staff, etc.</p>
+
+<h2 id="features">Features</h2>
+<ul>
+    <li><b>User Management:</b>
+        <ul>
+            <li>Create, view, update, and delete user profiles.</li>
+        </ul>
+    </li>
+    <li><b>Staff Management:</b>
+        <ul>
+            <li>Assign and remove requests to/from staff members.</li>
+            <li>View all assigned requests.</li>
+        </ul>
+    </li>
+</ul>
