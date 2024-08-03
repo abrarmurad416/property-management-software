@@ -251,88 +251,108 @@ public class Main {
 
 
 
-private static void showRequestsTable() {
-    JFrame requestFrame = new JFrame("Maintenance Requests");
-    requestFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    requestFrame.setSize(800, 600);
-
-    JPanel requestPanel = new JPanel(new BorderLayout());
-    requestFrame.add(requestPanel);
-
-    String[] columnNames = {"ID", "Tenant Name", "Issue Description", "Urgency Level", "Request Type"};
-
-    String[][] data = new String[requests.size()][5];
-    for (int i = 0; i < requests.size(); i++) {
-        MaintenanceRequest request = requests.get(i);
-        data[i][0] = String.valueOf(request.getRequestId());
-        data[i][1] = request.getTenantName();
-        data[i][2] = request.getIssueDescription();
-        data[i][3] = String.valueOf(request.getUrgencyLevel());
-        data[i][4] = request.getRequestType();
-    }
-
-    JTable table = new JTable(data, columnNames);
-    TableRowSorter<TableModel> sorter = new TableRowSorter<>(table.getModel());
-    table.setRowSorter(sorter);
-    JScrollPane scrollPane = new JScrollPane(table);
-    table.setFillsViewportHeight(true);
-
-    // Add search field
-    JTextField searchField = new JTextField(15);
-    searchField.getDocument().addDocumentListener(new DocumentListener() {
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            search(searchField.getText());
+    private static void showRequestsTable() {
+        JFrame requestFrame = new JFrame("Maintenance Requests");
+        requestFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        requestFrame.setSize(600, 400);
+    
+        JPanel requestPanel = new JPanel(new BorderLayout());
+        requestFrame.add(requestPanel);
+    
+        String[] columnNames = {"ID", "Tenant Name", "Issue Description", "Urgency Level", "Request Type"};
+    
+        String[][] data = new String[requests.size()][5];
+        for (int i = 0; i < requests.size(); i++) {
+            MaintenanceRequest request = requests.get(i);
+            data[i][0] = String.valueOf(request.getRequestId());
+            data[i][1] = request.getTenantName();
+            data[i][2] = request.getIssueDescription();
+            data[i][3] = String.valueOf(request.getUrgencyLevel());
+            data[i][4] = request.getRequestType();
         }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            search(searchField.getText());
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-            search(searchField.getText());
-        }
-
-        private void search(String str) {
-            if (str.length() == 0) {
-                sorter.setRowFilter(null);
-            } else {
-                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + str));
+    
+        JTable table = new JTable(data, columnNames);
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(table.getModel());
+        table.setRowSorter(sorter);
+        JScrollPane scrollPane = new JScrollPane(table);
+        table.setFillsViewportHeight(true);
+        requestPanel.add(scrollPane, BorderLayout.CENTER);
+    
+        // Filter panel
+        JPanel filterPanel = new JPanel();
+        requestPanel.add(filterPanel, BorderLayout.NORTH);
+    
+        JLabel filterLabel = new JLabel("Filter by Urgency:");
+        filterPanel.add(filterLabel);
+    
+        String[] urgencyLevels = {"All", "Low", "Medium", "High"};
+        JComboBox<String> urgencyFilter = new JComboBox<>(urgencyLevels);
+        filterPanel.add(urgencyFilter);
+    
+        // Search field
+        JLabel searchLabel = new JLabel("Search:");
+        filterPanel.add(searchLabel);
+    
+        JTextField searchField = new JTextField(15);
+        filterPanel.add(searchField);
+    
+        // Filter functionality
+        urgencyFilter.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selected = (String) urgencyFilter.getSelectedItem();
+                if ("All".equals(selected)) {
+                    sorter.setRowFilter(null);
+                } else {
+                    int urgency = -1;
+                    switch (selected) {
+                        case "Low":
+                            urgency = 0;
+                            break;
+                        case "Medium":
+                            urgency = 1;
+                            break;
+                        case "High":
+                            urgency = 2;
+                            break;
+                    }
+                    int finalUrgency = urgency;
+                    sorter.setRowFilter(new RowFilter<TableModel, Integer>() {
+                        @Override
+                        public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
+                            int modelIndex = entry.getIdentifier();
+                            return Integer.parseInt(entry.getModel().getValueAt(modelIndex, 3).toString()) == finalUrgency;
+                        }
+                    });
+                }
             }
-        }
-    });
-
-    // Add filter by urgency level
-    String[] urgencyLevels = {"All", "Low", "Medium", "High"};
-    JComboBox<String> urgencyFilter = new JComboBox<>(urgencyLevels);
-    urgencyFilter.addActionListener(e -> {
-        String selected = (String) urgencyFilter.getSelectedItem();
-        if ("All".equals(selected)) {
-            sorter.setRowFilter(null);
-        } else {
-            int urgency = switch (selected) {
-                case "Low" -> 0;
-                case "Medium" -> 1;
-                case "High" -> 2;
-                default -> -1;
-            };
-            sorter.setRowFilter(RowFilter.numberFilter(RowFilter.ComparisonType.EQUAL, urgency, 3));
-        }
-    });
-
-    JPanel controlPanel = new JPanel();
-    controlPanel.add(new JLabel("Search:"));
-    controlPanel.add(searchField);
-    controlPanel.add(new JLabel("Filter by Urgency:"));
-    controlPanel.add(urgencyFilter);
-
-    requestPanel.add(controlPanel, BorderLayout.NORTH);
-    requestPanel.add(scrollPane, BorderLayout.CENTER);
-
-    requestFrame.setVisible(true);
-}
+        });
+    
+        // Search functionality
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateFilter();
+            }
+    
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateFilter();
+            }
+    
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateFilter();
+            }
+    
+            private void updateFilter() {
+                String searchText = searchField.getText();
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText));
+            }
+        });
+    
+        requestFrame.setVisible(true);
+    }
 
     
 }
