@@ -1,9 +1,4 @@
 //Author: Sohan Hossain
-
-/* 
- * The tenant class represents any tenant that would interact with the property management system.
- * It extends the User class, and is comprised of additional properties and methods for the class specific to tenants.
- */
 import java.util.ArrayList;
 import java.util.List;
 

@@ -3,7 +3,6 @@ import java.util.List;
 
 public class RequestManager {
     private List<MaintenanceRequest> requests;
-    private List<User> users;
 
     // Constructor
     public RequestManager() {
@@ -41,10 +40,10 @@ public class RequestManager {
     }
 
     // Assign a staff member to a maintenance request
-    public void assignRequest(int requestId, String staffId) {
+    public void assignRequest(int requestId, Staff staff) {
         for (MaintenanceRequest request : requests) {
             if (request.getRequestId() == requestId) {
-                request.assignStaff(staffId);
+                request.assignStaff(staff);
                 break;
             }
         }

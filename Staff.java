@@ -5,10 +5,10 @@
 import java.util.ArrayList;
 
 public class Staff extends User {
-    private ArrayList<String> requests;
-    private String occupation; 
+    private ArrayList<MaintenanceRequest> requests; // Changed to hold MaintenanceRequest objects
+    private String occupation;
 
-    // Constructor ----------------------------------------------
+    // Constructor
     public Staff(String userID, String name, String email, String role, String occupation) {
         super(userID, name, email, role);
         this.requests = new ArrayList<>();
@@ -16,24 +16,27 @@ public class Staff extends User {
     }
 
     // Methods
-    public void assignRequestToStaff(String request) {
+    public void assignRequestToStaff(MaintenanceRequest request) {
         requests.add(request);
+        request.setAssignedStaff(this);
     }
 
-    public void removeRequestFromStaff(String request) {
+    public void removeRequestFromStaff(MaintenanceRequest request) {
         requests.remove(request);
+        request.setAssignedStaff(null);
     }
 
     // Getters
-    public ArrayList<String> getAssignedRequests() {
+    public ArrayList<MaintenanceRequest> getAssignedRequests() {
         return requests;
     }
 
     // Setters
-    public void setRequests(ArrayList<String> requests) {
+    public void setRequests(ArrayList<MaintenanceRequest> requests) {
         this.requests = requests;
     }
-    public String getOccupation() { 
+
+    public String getOccupation() {
         return occupation;
     }
 

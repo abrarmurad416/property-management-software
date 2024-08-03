@@ -1,9 +1,5 @@
 // Author, Abrar Murad
 
-/** 
- * The user class will represent the users that interact with the property managment system.
- * It is comprised of basic user information, such as the user's ID, name, email, and role.
- */
 
 public class User {
     private String userId;
